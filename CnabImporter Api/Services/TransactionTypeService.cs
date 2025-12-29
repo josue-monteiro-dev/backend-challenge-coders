@@ -5,9 +5,9 @@ public interface ITransactionTypeService
     Task<TransactionType?> GetByIdAsync(long id);
 	Task<List<TransactionType>> GetAllAsync(TransactionTypeFilters filters);
 	Task<TransactionType?> CreateAsync(TransactionType model);
-	Task<TransactionType?> UpdateAsync(TransactionType model, long loggedUserId, string loggedUserName);
-	Task<TransactionType?> PatchAsync(TransactionType model, long loggedUserId, string loggedUserName);
-	Task<bool?> DeleteAsync(long id, long loggedUserId, string loggedUserName);
+	Task<TransactionType?> UpdateAsync(TransactionType model, string loggedUserName);
+	Task<TransactionType?> PatchAsync(TransactionType model, string loggedUserName);
+	Task<bool?> DeleteAsync(long id, string loggedUserName);
 }
 
 public sealed class TransactionTypeService(
@@ -95,7 +95,7 @@ public sealed class TransactionTypeService(
 		return addResult.Entity;
 	}
 
-	public async Task<TransactionType?> UpdateAsync(TransactionType model, long loggedUserId, string loggedUserName)
+	public async Task<TransactionType?> UpdateAsync(TransactionType model, string loggedUserName)
 	{
 		var validation = await model.ValidateUpdateAsync();
 		if (!validation.IsValid)
@@ -118,7 +118,7 @@ public sealed class TransactionTypeService(
 		return entitie;
 	}
 
-	public async Task<TransactionType?> PatchAsync(TransactionType model, long loggedUserId, string loggedUserName)
+	public async Task<TransactionType?> PatchAsync(TransactionType model, string loggedUserName)
 	{
 		var validation = await model.ValidatePatchAsync();
 		if (!validation.IsValid)
@@ -141,7 +141,7 @@ public sealed class TransactionTypeService(
 		return entitie;
 	}
 
-	public async Task<bool?> DeleteAsync(long id, long loggedUserId, string loggedUserName)
+	public async Task<bool?> DeleteAsync(long id, string loggedUserName)
 	{
 		var entitie = await GetByIdAsync(id);
 		if (entitie == null) return null;

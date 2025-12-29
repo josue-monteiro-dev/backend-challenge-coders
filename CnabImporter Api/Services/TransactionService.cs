@@ -5,9 +5,9 @@ public interface ITransactionService
     Task<Transaction?> GetByIdAsync(long id);
 	Task<List<Transaction>> GetAllAsync(TransactionFilters filters);
 	Task<Transaction?> CreateAsync(Transaction model);
-	Task<Transaction?> UpdateAsync(Transaction model, long loggedUserId, string loggedUserName);
-	Task<Transaction?> PatchAsync(Transaction model, long loggedUserId, string loggedUserName);
-	Task<bool?> DeleteAsync(long id, long loggedUserId, string loggedUserName);
+	Task<Transaction?> UpdateAsync(Transaction model, string loggedUserName);
+	Task<Transaction?> PatchAsync(Transaction model, string loggedUserName);
+	Task<bool?> DeleteAsync(long id, string loggedUserName);
 	Task<bool?> UploadFileWithTransactions(IFormFile file, long loggedUserId, string loggedUserName);
 }
 
@@ -106,7 +106,7 @@ public sealed class TransactionService(
 		return addResult.Entity;
 	}
 
-	public async Task<Transaction?> UpdateAsync(Transaction model, long loggedUserId, string loggedUserName)
+	public async Task<Transaction?> UpdateAsync(Transaction model, string loggedUserName)
 	{
 		var validation = await model.ValidateUpdateAsync();
 		if (!validation.IsValid)
@@ -129,7 +129,7 @@ public sealed class TransactionService(
 		return entitie;
 	}
 
-	public async Task<Transaction?> PatchAsync(Transaction model, long loggedUserId, string loggedUserName)
+	public async Task<Transaction?> PatchAsync(Transaction model, string loggedUserName)
 	{
 		var validation = await model.ValidatePatchAsync();
 		if (!validation.IsValid)
@@ -152,7 +152,7 @@ public sealed class TransactionService(
 		return entitie;
 	}
 
-	public async Task<bool?> DeleteAsync(long id, long loggedUserId, string loggedUserName)
+	public async Task<bool?> DeleteAsync(long id, string loggedUserName)
 	{
 		var entitie = await GetByIdAsync(id);
 		if (entitie == null) return null;
@@ -176,7 +176,9 @@ public sealed class TransactionService(
 		}
 
 		var transactions = new List<Transaction>();
-		var transactionTypes = await db.TransactionTypes.ToDictionaryAsync(k => k.Id, v => v);
+		var transactionTypes = await db.TransactionTypes.ToDictionaryAsync(k => k.Id, v => v.Type);
+
+		logger.LogInformation("Starting to read the file with transactions.");
 
 		using var stream = file.OpenReadStream();
 		using var reader = new StreamReader(stream);
@@ -186,12 +188,17 @@ public sealed class TransactionService(
 			var line = await reader.ReadLineAsync();
 
 			if (string.IsNullOrWhiteSpace(line) || line.Length < 81)
+			{
+				logger.LogWarning("Skipping invalid or empty line: {Line}", line);
 				continue;
+			}
+
+			logger.LogInformation("Processing line: {Line}", line);
 
 			try
 			{
 				var type = int.Parse(line.Substring(0, 1));
-				if (!transactionTypes.ContainsKey(type))
+				if (!transactionTypes.ContainsValue(type))
 				{
 					var errorMsg = $"Invalid transaction type '{type}' in line: {line}";
 					logger.LogError(errorMsg);
@@ -221,7 +228,8 @@ public sealed class TransactionService(
 					Owner = line.Substring(48, 14).Trim(),
 					Store = line.Substring(62, 19).Trim(),
 
-					TransactionTypeId = type,
+					//Get ID from dictionary
+					TransactionTypeId = transactionTypes.FirstOrDefault(f => f.Value == type).Key,
 
 					CreatedAt = DateTime.UtcNow,
 					UpdatedAt = DateTime.UtcNow,
@@ -233,31 +241,44 @@ public sealed class TransactionService(
 			catch (Exception ex)
 			{
 				var errorMsg = $"Error parsing line: {line}";
-				logger.LogError(ex, errorMsg);
+				logger.LogError(ex, "{ErrorMsg}", errorMsg);
 				notification.AddNotification("UploadFileWithTransactions - reading line", errorMsg);
 			}
+
+			logger.LogInformation("Finished processing line: {Line}", line);
 		}
 
 		if (transactions.Count == 0)
+		{
+			var msg = "No transactions read.";
+			logger.LogInformation(msg);
+			notification.AddNotification("UploadFileWithTransactions - finish reading lines", msg);
 			return false;
+		}
 
 		using var transactionScope = await db.Database.BeginTransactionAsync();
+		logger.LogInformation("Saving {Count} transactions to the database.", transactions.Count);
 
 		try
 		{
 			db.Transactions.AddRange(transactions);
 			await db.SaveChangesAsync();
-
 			await transactionScope.CommitAsync();
-			return true;
+
+			logger.LogInformation("Transactions saved successfully.");
 		}
 		catch (Exception ex)
 		{
 			await transactionScope.RollbackAsync();
+			
 			var errorMsg = "Error saving transactions.";
 			logger.LogError(ex, errorMsg);
 			notification.AddNotification("UploadFileWithTransactions - reading line", errorMsg);
-			return null;
+			return false;
 		}
+
+		await db.UserLogs.AddAsync(new UserLog(loggedUserId, string.Format("User Id {0} uploaded file {1}.", loggedUserId, file.Name)));
+		
+		return true;
 	}
 }

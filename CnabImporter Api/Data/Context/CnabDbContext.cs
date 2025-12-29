@@ -1,6 +1,6 @@
 ﻿namespace Api.Data.Context;
 
-public class CnabDbContext(DbContextOptions<CnabDbContext> o, IConfiguration config) : DbContext(o)
+public class CnabDbContext(DbContextOptions<CnabDbContext> o) : DbContext(o)
 {
 	public DbSet<Email> Emails => Set<Email>();
 	public DbSet<User> Users => Set<User>();

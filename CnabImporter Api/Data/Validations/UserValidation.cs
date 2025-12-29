@@ -3,8 +3,10 @@
 public sealed class UserCreateValidator : Validation<User>
 {
     public UserCreateValidator()
-    {
-        RuleFor(p => p.Email).NotEmpty().NotNull().EmailAddress();
+	{
+		RuleFor(p => p.FirstName).NotEmpty().NotNull();
+		RuleFor(p => p.LastName).NotEmpty().NotNull();
+		RuleFor(p => p.Email).NotEmpty().NotNull().EmailAddress();
         RuleFor(p => p.SignInWith).NotEmpty().NotNull();
         RuleFor(p => p.Type).NotNull();
         When(p => !string.IsNullOrEmpty(p.SignInWith) && p.SignInWith.Equals(SignIn.Default.ToString(), StringComparison.CurrentCultureIgnoreCase),

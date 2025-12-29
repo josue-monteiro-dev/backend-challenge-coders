@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36429.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api.csproj", "{58A4C6A7-E2A1-476B-81F6-ACE9C17DECC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnabImporter.Tests", "..\CnabImporter.Tests\CnabImporter.Tests.csproj", "{B530986D-E553-4A93-8E00-734EF8E9F403}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CnabImporter.Tests", "..\CnabImporter Tests\CnabImporter.Tests.csproj", "{871D1228-E6F3-01FE-1B4C-39497ED57764}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{58A4C6A7-E2A1-476B-81F6-ACE9C17DECC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58A4C6A7-E2A1-476B-81F6-ACE9C17DECC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58A4C6A7-E2A1-476B-81F6-ACE9C17DECC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B530986D-E553-4A93-8E00-734EF8E9F403}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B530986D-E553-4A93-8E00-734EF8E9F403}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B530986D-E553-4A93-8E00-734EF8E9F403}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B530986D-E553-4A93-8E00-734EF8E9F403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{871D1228-E6F3-01FE-1B4C-39497ED57764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{871D1228-E6F3-01FE-1B4C-39497ED57764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{871D1228-E6F3-01FE-1B4C-39497ED57764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{871D1228-E6F3-01FE-1B4C-39497ED57764}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

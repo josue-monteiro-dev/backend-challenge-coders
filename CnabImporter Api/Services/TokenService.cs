@@ -25,10 +25,7 @@ public sealed class TokenService(IOptions<Security> security) : ITokenService
             claims.Add(new Claim(ClaimTypes.Role, "Delete"));
 
         if (user.Type == UserType.Admin)
-        {
             claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-            claims.Add(new Claim(ClaimTypes.Role, "GetIncomes"));
-        }
 
         var token = new JwtSecurityToken(
             claims: claims,

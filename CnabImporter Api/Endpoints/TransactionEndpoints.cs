@@ -68,9 +68,8 @@ public static class TransactionEndpoints
             [FromServices] INotificationService notification,
             HttpContext context) =>
         {
-            var loggedUserId = TokenExtension.GetUserIdFromToken(context);
             var loggedUserName = TokenExtension.GetUserNameFromToken(context);
-            var entitie = await service.UpdateAsync(model, loggedUserId, loggedUserName);
+            var entitie = await service.UpdateAsync(model, loggedUserName);
             if (notification.HasNotifications) return Results.BadRequest(notification.Notifications);
             if (entitie is null) return Results.NoContent();
             return Results.Ok(entitie);
@@ -92,9 +91,8 @@ public static class TransactionEndpoints
             [FromServices] INotificationService notification,
             HttpContext context) =>
 		{
-			var loggedUserId = TokenExtension.GetUserIdFromToken(context);
 			var loggedUserName = TokenExtension.GetUserNameFromToken(context);
-			var entitie = await service.PatchAsync(model, loggedUserId, loggedUserName);
+			var entitie = await service.PatchAsync(model, loggedUserName);
 			if (notification.HasNotifications) return Results.BadRequest(notification.Notifications);
             if (entitie is null) return Results.NoContent();
             return Results.Ok(entitie);
@@ -116,9 +114,8 @@ public static class TransactionEndpoints
             [FromServices] INotificationService notification,
             HttpContext context) =>
 		{
-			var loggedUserId = TokenExtension.GetUserIdFromToken(context);
 			var loggedUserName = TokenExtension.GetUserNameFromToken(context);
-			var result = await service.DeleteAsync(id, loggedUserId, loggedUserName);
+			var result = await service.DeleteAsync(id, loggedUserName);
             if (notification.HasNotifications) return Results.BadRequest(notification.Notifications);
             if (result == null) return Results.NoContent();
             return Results.Ok(result);
