@@ -67,7 +67,7 @@ public class TransactionServiceTests
 			TransactionTypeId = 1
 		};
 
-		await _service.CreateAsync(transaction);
+		await _service.CreateAsync(transaction, 1);
 
 		var result = await _service.GetByIdAsync(1);
 
@@ -126,7 +126,7 @@ public class TransactionServiceTests
 			Value = 100
 		};
 
-		var result = await _service.CreateAsync(transaction);
+		var result = await _service.CreateAsync(transaction, 1);
 
 		result.Should().NotBeNull();
 		_db.Transactions.Should().HaveCount(1);
@@ -137,7 +137,7 @@ public class TransactionServiceTests
 	{
 		var transaction = new Transaction { TransactionTypeId = 999 };
 
-		var result = await _service.CreateAsync(transaction);
+		var result = await _service.CreateAsync(transaction, 1);
 
 		result.Should().BeNull();
 		_notificationMock.Verify(n =>

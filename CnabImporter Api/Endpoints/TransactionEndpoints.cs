@@ -1,4 +1,6 @@
-﻿namespace Api.Endpoints;
+﻿using Polly;
+
+namespace Api.Endpoints;
 
 public static class TransactionEndpoints
 {
@@ -45,9 +47,11 @@ public static class TransactionEndpoints
         async (
             Transaction model,
             [FromServices] ITransactionService service,
-            [FromServices] INotificationService notification) =>
-        {
-            var entitie = await service.CreateAsync(model);
+            [FromServices] INotificationService notification,
+			HttpContext context) =>
+		{
+			var loggedUserId = TokenExtension.GetUserIdFromToken(context);
+			var entitie = await service.CreateAsync(model, loggedUserId);
             if (notification.HasNotifications) return Results.BadRequest(notification.Notifications);
             return Results.Created($"/transactions/{entitie!.Id}", entitie);
         })

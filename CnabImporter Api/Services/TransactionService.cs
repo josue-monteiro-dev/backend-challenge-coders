@@ -4,7 +4,7 @@ public interface ITransactionService
 {
     Task<Transaction?> GetByIdAsync(long id);
 	Task<List<Transaction>> GetAllAsync(TransactionFilters filters);
-	Task<Transaction?> CreateAsync(Transaction model);
+	Task<Transaction?> CreateAsync(Transaction model, long loggedUserId);
 	Task<Transaction?> UpdateAsync(Transaction model, string loggedUserName);
 	Task<Transaction?> PatchAsync(Transaction model, string loggedUserName);
 	Task<bool?> DeleteAsync(long id, string loggedUserName);
@@ -84,7 +84,7 @@ public sealed class TransactionService(
 		return await query.ToListAsync();
 	}
 
-	public async Task<Transaction?> CreateAsync(Transaction model)
+	public async Task<Transaction?> CreateAsync(Transaction model, long loggedUserId)
 	{
 		var validation = await model.ValidateCreateAsync();
 		if (!validation.IsValid)
@@ -99,6 +99,8 @@ public sealed class TransactionService(
 			notification.AddNotification("TransactionType", "Transaction Type invalid.");
 			return default;
 		}
+
+		model.UserId = loggedUserId;
 
 		var addResult = await db.Transactions.AddAsync(model);
 		await db.SaveChangesAsync();
