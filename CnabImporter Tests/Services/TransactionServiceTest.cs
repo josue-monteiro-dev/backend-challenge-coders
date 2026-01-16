@@ -22,12 +22,11 @@ public class TransactionServiceTests
 	public TransactionServiceTests()
 	{
 		var options = new DbContextOptionsBuilder<CnabDbContext>()
-			.UseSqlite("Data Source=CnabImporterTests.db;Cache=Shared")
+			.UseSqlite("Filename=:memory:")
 			.EnableSensitiveDataLogging()
 			.Options;
 
 		_db = new CnabDbContext(options);
-		_db.Database.EnsureDeleted();
 		_db.Database.EnsureCreated();
 
 		_notificationMock = new Mock<INotificationService>();

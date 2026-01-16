@@ -15,10 +15,11 @@ public static class AppExtensions
 
         app.UseHttpsRedirection();
         app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-        app.UseAuthentication();
-        app.UseAuthorization();
+        //app.UseAuthentication();
+        //app.UseAuthorization();
         app.UseExceptionHandleMiddleware();
 
+        app.MapLoginEndpoints();
         app.MapUserEndpoints();
 		app.MapTransactionEndpoints();
 		app.MapTransactionTypeEndpoints();
